@@ -1,0 +1,62 @@
+2024-07-23 18:17:09,184 INFO  - MaterializeWorkflowDescriptorActor [UUID(74b526bb)]: Parsing workflow as WDL 1.0
+2024-07-23 18:17:09,819 INFO  - MaterializeWorkflowDescriptorActor [UUID(74b526bb)]: Call-to-Backend assignments: CEMBA.IndexBam -> Local, CEMBA.TrimSingleRead2 -> Local, CEMBA.GetMethylationReportForAboveMinMapQReads -> Local, CEMBA.MergeBams -> Local, CEMBA.MapReadsPairedEnd -> Local, CEMBA.TrimSingleRead1 -> Local, CEMBA.FilterMapQuality -> Local, CEMBA.FilterDuplicates -> Local, CEMBA.AddReadGroup -> Local, CEMBA.CreateUnmappedBam -> Local, CEMBA.GetMethylationReportForBelowMinMapQReads -> Local, CEMBA.GetMethylationReportForFilterDuplicates -> Local, CEMBA.TrimAdapters -> Local, CEMBA.GetMethylationSiteVCF -> Local, CEMBA.MapReadSingleEndRead2 -> Local, CEMBA.AttachBarcodes -> Local, CEMBA.MapReadSingleEndRead1 -> Local, CEMBA.ExtractCellBarcodes -> Local, CEMBA.SortAlignmentOutputBam -> Local, CEMBA.VCFtoALLC -> Local, CEMBA.SortFilteredBamWithReadGroup -> Local, CEMBA.ComputeCoverageDepth -> Local
+2024-07-23 18:17:12,270 INFO  - WorkflowExecutionActor-74b526bb-f159-4354-916f-b0495e1792bc [UUID(74b526bb)]: Starting CEMBA.TrimAdapters
+2024-07-23 18:17:20,017 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(74b526bb)CEMBA.TrimAdapters:NA:1]: `# fastq's, "-f", -A for paired adapters read 2"
+cutadapt \
+  -f fastq \
+  --minimum-length 62 \
+  --output CEMBA.R1.trimmed_adapters.fastq.gz \
+  --paired-output CEMBA.R2.trimmed_adapters.fastq.gz \
+  --quality-cutoff 20 \
+  --adapter AGATCGGAAGAGCACACGTCTGAAC \
+  -A AGATCGGAAGAGCGTCGTGTAGGGA \
+    \
+   \
+  /cromwell-executions/CEMBA/74b526bb-f159-4354-916f-b0495e1792bc/call-TrimAdapters/inputs/451474976/ADrep1subsample_R1.fastq.gz /cromwell-executions/CEMBA/74b526bb-f159-4354-916f-b0495e1792bc/call-TrimAdapters/inputs/451474976/ADrep1subsample_R2.fastq.gz`
+2024-07-23 18:17:20,047 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(74b526bb)CEMBA.TrimAdapters:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/broadinstitute/cutadapt@sha256:9c47a1d6dab6196b13522a6d4d354b14c8aa777bb423d8119deb94d6ecfdc6ef \
+echo "successfully pulled quay.io/broadinstitute/cutadapt@sha256:9c47a1d6dab6196b13522a6d4d354b14c8aa777bb423d8119deb94d6ecfdc6ef!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "16" != "1" ];
+then
+    PE="-pe omp 16"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_74b526bb_TrimAdapters \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/74b526bb-f159-4354-916f-b0495e1792bc/call-TrimAdapters \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/74b526bb-f159-4354-916f-b0495e1792bc/call-TrimAdapters/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/74b526bb-f159-4354-916f-b0495e1792bc/call-TrimAdapters/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/74b526bb-f159-4354-916f-b0495e1792bc/call-TrimAdapters:/cromwell-executions/CEMBA/74b526bb-f159-4354-916f-b0495e1792bc/call-TrimAdapters \
+      docker://quay.io/broadinstitute/cutadapt@sha256:9c47a1d6dab6196b13522a6d4d354b14c8aa777bb423d8119deb94d6ecfdc6ef /bin/bash \
+      /cromwell-executions/CEMBA/74b526bb-f159-4354-916f-b0495e1792bc/call-TrimAdapters/execution/script
+2024-07-23 18:17:23,796 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(74b526bb)CEMBA.TrimAdapters:NA:1]: job id: 3057170
+2024-07-23 18:17:23,802 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(74b526bb)CEMBA.TrimAdapters:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-23 18:33:55,215 INFO  - WorkflowExecutionActor-74b526bb-f159-4354-916f-b0495e1792bc [UUID(74b526bb)]: Aborting workflow
+2024-07-23 18:33:55,237 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(74b526bb)CEMBA.TrimAdapters:NA:1]: executing: docker kill `cat /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/74b526bb-f159-4354-916f-b0495e1792bc/call-TrimAdapters/execution/docker_cid`
+2024-07-23 18:33:55,262 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(74b526bb)CEMBA.TrimAdapters:NA:1]: BackgroundConfigAsyncJobExecutionActor [UUID(74b526bb):CEMBA.TrimAdapters:NA:1] Aborted StandardAsyncJob(3057170)

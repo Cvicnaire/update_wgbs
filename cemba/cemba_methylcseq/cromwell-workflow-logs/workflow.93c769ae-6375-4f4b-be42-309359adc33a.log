@@ -1,0 +1,478 @@
+2024-07-23 21:56:05,986 INFO  - MaterializeWorkflowDescriptorActor [UUID(93c769ae)]: Parsing workflow as WDL 1.0
+2024-07-23 21:56:06,650 INFO  - MaterializeWorkflowDescriptorActor [UUID(93c769ae)]: Call-to-Backend assignments: CEMBA.FilterDuplicates -> Local, CEMBA.ComputeCoverageDepth -> Local, CEMBA.VCFtoALLC -> Local, CEMBA.SortFilteredBamWithReadGroup -> Local, CEMBA.TrimAdapters -> Local, CEMBA.MapReadSingleEndRead2 -> Local, CEMBA.GetMethylationReportForAboveMinMapQReads -> Local, CEMBA.SortAlignmentOutputBam -> Local, CEMBA.MergeBams -> Local, CEMBA.GetMethylationReportForFilterDuplicates -> Local, CEMBA.TrimSingleRead2 -> Local, CEMBA.AddReadGroup -> Local, CEMBA.ExtractCellBarcodes -> Local, CEMBA.GetMethylationReportForBelowMinMapQReads -> Local, CEMBA.MapReadSingleEndRead1 -> Local, CEMBA.FilterMapQuality -> Local, CEMBA.AttachBarcodes -> Local, CEMBA.TrimSingleRead1 -> Local, CEMBA.IndexBam -> Local, CEMBA.CreateUnmappedBam -> Local, CEMBA.MapReadsPairedEnd -> Local, CEMBA.GetMethylationSiteVCF -> Local
+2024-07-23 21:56:08,919 INFO  - WorkflowExecutionActor-93c769ae-6375-4f4b-be42-309359adc33a [UUID(93c769ae)]: Starting CEMBA.TrimAdapters
+2024-07-23 21:56:16,608 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimAdapters:NA:1]: `# fastq's, "-f", -A for paired adapters read 2"
+  cutadapt \
+  --minimum-length 62 \
+  --output CEMBA.R1.trimmed_adapters.fastq.gz \
+  --paired-output CEMBA.R2.trimmed_adapters.fastq.gz \
+  --quality-cutoff 20 \
+  --adapter AGATCGGAAGAGCACACGTCTGAAC \
+  -A AGATCGGAAGAGCGTCGTGTAGGGA \
+    \
+   \
+  /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimAdapters/inputs/451474976/ADrep1subsample_R1.fastq.gz /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimAdapters/inputs/451474976/ADrep1subsample_R2.fastq.gz`
+2024-07-23 21:56:16,638 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimAdapters:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/cutadapt@sha256:bc57ecd8fc26c9586f307b911f69c48a29105a7e1e2699806ea99f0f993d1b30 \
+echo "successfully pulled quay.io/biocontainers/cutadapt@sha256:bc57ecd8fc26c9586f307b911f69c48a29105a7e1e2699806ea99f0f993d1b30!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "16" != "1" ];
+then
+    PE="-pe omp 16"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_93c769ae_TrimAdapters \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimAdapters \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimAdapters/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimAdapters/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimAdapters:/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimAdapters \
+      docker://quay.io/biocontainers/cutadapt@sha256:bc57ecd8fc26c9586f307b911f69c48a29105a7e1e2699806ea99f0f993d1b30 /bin/bash \
+      /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimAdapters/execution/script
+2024-07-23 21:56:20,632 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimAdapters:NA:1]: job id: 4094560
+2024-07-23 21:56:20,636 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimAdapters:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-23 21:59:12,319 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimAdapters:NA:1]: Status change from WaitingForReturnCode to Done
+2024-07-23 21:59:13,556 INFO  - WorkflowExecutionActor-93c769ae-6375-4f4b-be42-309359adc33a [UUID(93c769ae)]: Starting CEMBA.TrimSingleRead2, CEMBA.TrimSingleRead1
+2024-07-23 21:59:15,945 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead1:NA:1]: `# fastq's, "-f", -A for paired adapters read 2"
+  cutadapt \
+  --minimum-length 30 \
+  --output CEMBA.R1.trimmed_single.fastq.gz \
+    \
+    \
+    \
+    \
+  --cut 16 \
+  --cut -16 \
+  /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead1/inputs/1098976487/CEMBA.R1.trimmed_adapters.fastq.gz`
+2024-07-23 21:59:15,951 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead1:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/cutadapt@sha256:bc57ecd8fc26c9586f307b911f69c48a29105a7e1e2699806ea99f0f993d1b30 \
+echo "successfully pulled quay.io/biocontainers/cutadapt@sha256:bc57ecd8fc26c9586f307b911f69c48a29105a7e1e2699806ea99f0f993d1b30!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "16" != "1" ];
+then
+    PE="-pe omp 16"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_93c769ae_TrimSingleRead1 \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead1 \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead1/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead1/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead1:/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead1 \
+      docker://quay.io/biocontainers/cutadapt@sha256:bc57ecd8fc26c9586f307b911f69c48a29105a7e1e2699806ea99f0f993d1b30 /bin/bash \
+      /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead1/execution/script
+2024-07-23 21:59:15,964 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead2:NA:1]: `# fastq's, "-f", -A for paired adapters read 2"
+  cutadapt \
+  --minimum-length 30 \
+  --output CEMBA.R2.trimmed_single.fastq.gz \
+    \
+    \
+    \
+    \
+  --cut 16 \
+  --cut -16 \
+  /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead2/inputs/1098976487/CEMBA.R2.trimmed_adapters.fastq.gz`
+2024-07-23 21:59:15,970 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead2:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/cutadapt@sha256:bc57ecd8fc26c9586f307b911f69c48a29105a7e1e2699806ea99f0f993d1b30 \
+echo "successfully pulled quay.io/biocontainers/cutadapt@sha256:bc57ecd8fc26c9586f307b911f69c48a29105a7e1e2699806ea99f0f993d1b30!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "16" != "1" ];
+then
+    PE="-pe omp 16"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_93c769ae_TrimSingleRead2 \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead2 \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead2/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead2/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead2:/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead2 \
+      docker://quay.io/biocontainers/cutadapt@sha256:bc57ecd8fc26c9586f307b911f69c48a29105a7e1e2699806ea99f0f993d1b30 /bin/bash \
+      /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-TrimSingleRead2/execution/script
+2024-07-23 21:59:20,616 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead1:NA:1]: job id: 4110194
+2024-07-23 21:59:20,616 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead2:NA:1]: job id: 4110219
+2024-07-23 21:59:20,616 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead1:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-23 21:59:20,616 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead2:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-23 22:00:54,300 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead2:NA:1]: Status change from WaitingForReturnCode to Done
+2024-07-23 22:01:04,030 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.TrimSingleRead1:NA:1]: Status change from WaitingForReturnCode to Done
+2024-07-23 22:01:05,755 INFO  - WorkflowExecutionActor-93c769ae-6375-4f4b-be42-309359adc33a [UUID(93c769ae)]: Starting CEMBA.MapReadsPairedEnd
+2024-07-23 22:01:06,074 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.MapReadsPairedEnd:NA:1]: `set -euo pipefail
+
+
+# create dir struture required by bismark
+# move input files into corresponding sub dir
+declare -a REF_DIR=$(mktemp -d genome_refXXXXXX)
+mkdir $REF_DIR/Bisulfite_Genome
+mkdir $REF_DIR/Bisulfite_Genome/CT_conversion
+mkdir $REF_DIR/Bisulfite_Genome/GA_conversion
+
+mv /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/GRCh38.primary_assembly.genome.fa $REF_DIR
+mv /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/GRCh38.primary_assembly.genome.fa.fai $REF_DIR
+mv /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/genome_mfa.CT_conversion.fa $REF_DIR/Bisulfite_Genome/CT_conversion
+mv /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_CT.1.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_CT.2.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_CT.3.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_CT.4.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_CT.rev.1.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_CT.rev.2.bt2 $REF_DIR/Bisulfite_Genome/CT_conversion
+mv /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/genome_mfa.GA_conversion.fa $REF_DIR/Bisulfite_Genome/GA_conversion
+mv /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_GA.1.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_GA.2.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_GA.3.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_GA.4.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_GA.rev.1.bt2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/1346891860/BS_GA.rev.2.bt2 $REF_DIR/Bisulfite_Genome/GA_conversion
+
+# use bismark with bowtie2 to align the read
+# icpc to not attach read ID descriptions to read ID
+  bismark $REF_DIR/ \
+  --bowtie2 \
+  --icpc \
+  -1 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/-1760258910/CEMBA.R1.trimmed_single.fastq.gz \
+  -2 /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/inputs/737757027/CEMBA.R2.trimmed_single.fastq.gz \
+  -X 2000 \
+  --pbat
+
+# rename defualt bismark output name to match basename
+mv CEMBA.R1.trimmed_single_bismark_bt2_pe.bam CEMBA.paired_end.aligned.bam
+mv CEMBA.R1.trimmed_single_bismark_bt2_PE_report.txt CEMBA.paired_end.alignment_report.txt`
+2024-07-23 22:01:06,078 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.MapReadsPairedEnd:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/bismark@sha256:b06de320ad1ac9057e404105eac58587e2d5f076b62f146c11259dadfe07e20f \
+echo "successfully pulled quay.io/biocontainers/bismark@sha256:b06de320ad1ac9057e404105eac58587e2d5f076b62f146c11259dadfe07e20f!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "16" != "1" ];
+then
+    PE="-pe omp 16"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_93c769ae_MapReadsPairedEnd \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd:/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd \
+      docker://quay.io/biocontainers/bismark@sha256:b06de320ad1ac9057e404105eac58587e2d5f076b62f146c11259dadfe07e20f /bin/bash \
+      /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-MapReadsPairedEnd/execution/script
+2024-07-23 22:01:10,607 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.MapReadsPairedEnd:NA:1]: job id: 4115777
+2024-07-23 22:01:10,608 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.MapReadsPairedEnd:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-23 22:03:15,378 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.MapReadsPairedEnd:NA:1]: Status change from WaitingForReturnCode to Done
+2024-07-23 22:03:21,436 INFO  - WorkflowExecutionActor-93c769ae-6375-4f4b-be42-309359adc33a [UUID(93c769ae)]: Starting CEMBA.SortAlignmentOutputBam
+2024-07-23 22:03:26,024 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.SortAlignmentOutputBam:0:1]: `set -euo pipefail
+
+
+  picard SortSam \
+  INPUT=/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-SortAlignmentOutputBam/shard-0/inputs/-876985678/CEMBA.paired_end.aligned.bam \
+  SORT_ORDER=coordinate \
+  MAX_RECORDS_IN_RAM=300000 \
+  OUTPUT=CEMBA.sorted.bam`
+2024-07-23 22:03:26,030 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.SortAlignmentOutputBam:0:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/mulled-v2-23d9f7c700e78129a769e78521eb86d6b8341923@sha256:57f40c3c30a48a7be6e2b101b0b7b5503920be2eb7b452c64fa996a31476314c \
+echo "successfully pulled quay.io/biocontainers/mulled-v2-23d9f7c700e78129a769e78521eb86d6b8341923@sha256:57f40c3c30a48a7be6e2b101b0b7b5503920be2eb7b452c64fa996a31476314c!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "1" != "1" ];
+then
+    PE="-pe omp 1"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_93c769ae_SortAlignmentOutputBam \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-SortAlignmentOutputBam/shard-0 \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-SortAlignmentOutputBam/shard-0/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-SortAlignmentOutputBam/shard-0/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-SortAlignmentOutputBam/shard-0:/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-SortAlignmentOutputBam/shard-0 \
+      docker://quay.io/biocontainers/mulled-v2-23d9f7c700e78129a769e78521eb86d6b8341923@sha256:57f40c3c30a48a7be6e2b101b0b7b5503920be2eb7b452c64fa996a31476314c /bin/bash \
+      /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-SortAlignmentOutputBam/shard-0/execution/script
+2024-07-23 22:03:30,607 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.SortAlignmentOutputBam:0:1]: job id: 4122838
+2024-07-23 22:03:30,608 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.SortAlignmentOutputBam:0:1]: Status change from - to WaitingForReturnCode
+2024-07-23 22:06:37,648 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.SortAlignmentOutputBam:0:1]: Status change from WaitingForReturnCode to Done
+2024-07-23 22:06:39,316 INFO  - WorkflowExecutionActor-93c769ae-6375-4f4b-be42-309359adc33a [UUID(93c769ae)]: Starting CEMBA.FilterDuplicates
+2024-07-23 22:06:45,910 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterDuplicates:0:1]: `set -euo pipefail
+
+  picard MarkDuplicates \
+  INPUT=/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterDuplicates/shard-0/inputs/651886203/CEMBA.sorted.bam \
+  OUTPUT=CEMBA.filtered.duplicates.bam \
+  METRICS_FILE=CEMBA.filtered.duplicate_metrics \
+  REMOVE_DUPLICATES=true`
+2024-07-23 22:06:45,915 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterDuplicates:0:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/mulled-v2-23d9f7c700e78129a769e78521eb86d6b8341923@sha256:57f40c3c30a48a7be6e2b101b0b7b5503920be2eb7b452c64fa996a31476314c \
+echo "successfully pulled quay.io/biocontainers/mulled-v2-23d9f7c700e78129a769e78521eb86d6b8341923@sha256:57f40c3c30a48a7be6e2b101b0b7b5503920be2eb7b452c64fa996a31476314c!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "1" != "1" ];
+then
+    PE="-pe omp 1"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_93c769ae_FilterDuplicates \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterDuplicates/shard-0 \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterDuplicates/shard-0/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterDuplicates/shard-0/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterDuplicates/shard-0:/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterDuplicates/shard-0 \
+      docker://quay.io/biocontainers/mulled-v2-23d9f7c700e78129a769e78521eb86d6b8341923@sha256:57f40c3c30a48a7be6e2b101b0b7b5503920be2eb7b452c64fa996a31476314c /bin/bash \
+      /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterDuplicates/shard-0/execution/script
+2024-07-23 22:06:50,614 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterDuplicates:0:1]: job id: 4134207
+2024-07-23 22:06:50,616 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterDuplicates:0:1]: Status change from - to WaitingForReturnCode
+2024-07-23 22:11:28,949 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterDuplicates:0:1]: Status change from WaitingForReturnCode to Done
+2024-07-23 22:11:30,016 INFO  - WorkflowExecutionActor-93c769ae-6375-4f4b-be42-309359adc33a [UUID(93c769ae)]: Starting CEMBA.GetMethylationReportForFilterDuplicates, CEMBA.FilterMapQuality
+2024-07-23 22:11:35,908 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.GetMethylationReportForFilterDuplicates:0:1]: `set -euo pipefail
+
+
+# get methylation report using Bismark
+/Bismark/bismark_methylation_extractor \
+  --comprehensive \
+  --merge_non_CpG \
+  --report \
+  /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-GetMethylationReportForFilterDuplicates/shard-0/inputs/1715504627/CEMBA.filtered.duplicates.bam
+
+# rename outputs
+mv CEMBA.filtered.duplicates.M-bias.txt CEMBA.Mbias_report.txt
+mv CEMBA.filtered.duplicates_splitting_report.txt CEMBA.splitting_report.txt
+mv CpG_context_CEMBA.filtered.duplicates.txt CEMBA.CpG_context_report.txt
+mv Non_CpG_context_CEMBA.filtered.duplicates.txt CEMBA.non_CpG_context_report.txt`
+2024-07-23 22:11:35,913 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.GetMethylationReportForFilterDuplicates:0:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/bismark@sha256:b06de320ad1ac9057e404105eac58587e2d5f076b62f146c11259dadfe07e20f \
+echo "successfully pulled quay.io/biocontainers/bismark@sha256:b06de320ad1ac9057e404105eac58587e2d5f076b62f146c11259dadfe07e20f!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "16" != "1" ];
+then
+    PE="-pe omp 16"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_93c769ae_GetMethylationReportForFilterDuplicates \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-GetMethylationReportForFilterDuplicates/shard-0 \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-GetMethylationReportForFilterDuplicates/shard-0/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-GetMethylationReportForFilterDuplicates/shard-0/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-GetMethylationReportForFilterDuplicates/shard-0:/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-GetMethylationReportForFilterDuplicates/shard-0 \
+      docker://quay.io/biocontainers/bismark@sha256:b06de320ad1ac9057e404105eac58587e2d5f076b62f146c11259dadfe07e20f /bin/bash \
+      /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-GetMethylationReportForFilterDuplicates/shard-0/execution/script
+2024-07-23 22:11:36,044 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterMapQuality:0:1]: `set -euo pipefail
+
+
+
+# filter for a map quality
+# -b output is bam, -h include header, -q reads with mapping quality >=
+samtools view \
+  -bhq10 \
+  -U CEMBA.filtered.below_min_map_quality.bam \
+  /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterMapQuality/shard-0/inputs/1715504627/CEMBA.filtered.duplicates.bam > CEMBA.filtered.above_min_map_quality.bam`
+2024-07-23 22:11:36,050 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterMapQuality:0:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/mulled-v2-03d30cf7bcc23ba5d755e498a98359af8a2cd947@sha256:85901b220b231c459862178478f72885b2ebda35e45f560bf14b8ff2e27ec310 \
+echo "successfully pulled quay.io/biocontainers/mulled-v2-03d30cf7bcc23ba5d755e498a98359af8a2cd947@sha256:85901b220b231c459862178478f72885b2ebda35e45f560bf14b8ff2e27ec310!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "1" != "1" ];
+then
+    PE="-pe omp 1"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_93c769ae_FilterMapQuality \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterMapQuality/shard-0 \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterMapQuality/shard-0/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterMapQuality/shard-0/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterMapQuality/shard-0:/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterMapQuality/shard-0 \
+      docker://quay.io/biocontainers/mulled-v2-03d30cf7bcc23ba5d755e498a98359af8a2cd947@sha256:85901b220b231c459862178478f72885b2ebda35e45f560bf14b8ff2e27ec310 /bin/bash \
+      /cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterMapQuality/shard-0/execution/script
+2024-07-23 22:11:40,606 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.GetMethylationReportForFilterDuplicates:0:1]: job id: 4150723
+2024-07-23 22:11:40,606 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterMapQuality:0:1]: job id: 4150768
+2024-07-23 22:11:40,607 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.GetMethylationReportForFilterDuplicates:0:1]: Status change from - to WaitingForReturnCode
+2024-07-23 22:11:40,608 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterMapQuality:0:1]: Status change from - to WaitingForReturnCode
+2024-07-23 22:11:44,159 INFO  - WorkflowExecutionActor-93c769ae-6375-4f4b-be42-309359adc33a [UUID(93c769ae)]: Aborting workflow
+2024-07-23 22:11:44,172 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterMapQuality:0:1]: executing: docker kill `cat /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-FilterMapQuality/shard-0/execution/docker_cid`
+2024-07-23 22:11:44,172 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.GetMethylationReportForFilterDuplicates:0:1]: executing: docker kill `cat /projectnb/bubhub/cromwell/cromwell-executions/CEMBA/93c769ae-6375-4f4b-be42-309359adc33a/call-GetMethylationReportForFilterDuplicates/shard-0/execution/docker_cid`
+2024-07-23 22:11:44,196 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterMapQuality:0:1]: BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae):CEMBA.FilterMapQuality:0:1] Aborted StandardAsyncJob(4150768)
+2024-07-23 22:11:44,196 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.GetMethylationReportForFilterDuplicates:0:1]: BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae):CEMBA.GetMethylationReportForFilterDuplicates:0:1] Aborted StandardAsyncJob(4150723)
+2024-07-23 22:11:45,424 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.FilterMapQuality:0:1]: Status change from WaitingForReturnCode to Done
+2024-07-23 22:11:45,442 INFO  - WorkflowExecutionActor-93c769ae-6375-4f4b-be42-309359adc33a [UUID(93c769ae)]: WorkflowExecutionActor [UUID(93c769ae)] aborted: CEMBA.FilterMapQuality:0:1
+2024-07-23 22:11:45,614 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(93c769ae)CEMBA.GetMethylationReportForFilterDuplicates:0:1]: Status change from WaitingForReturnCode to Done
+2024-07-23 22:11:45,617 INFO  - WorkflowExecutionActor-93c769ae-6375-4f4b-be42-309359adc33a [UUID(93c769ae)]: WorkflowExecutionActor [UUID(93c769ae)] aborted: CEMBA.GetMethylationReportForFilterDuplicates:0:1

@@ -1,0 +1,196 @@
+2024-07-18 14:36:04,023 INFO  - MaterializeWorkflowDescriptorActor [UUID(9c0c8043)]: Parsing workflow as WDL 1.0
+2024-07-18 14:36:04,427 INFO  - MaterializeWorkflowDescriptorActor [UUID(9c0c8043)]: Call-to-Backend assignments: BuildCembaReferences.CreateReferenceFastaIndex -> Local, BuildCembaReferences.CreateReferenceDictionary -> Local, BuildCembaReferences.Convert -> Local, BuildCembaReferences.IndexReverse -> Local, BuildCembaReferences.IndexForward -> Local
+2024-07-18 14:36:04,556 WARN  - Local [UUID(9c0c8043)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 14:36:04,556 WARN  - Local [UUID(9c0c8043)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 14:36:04,556 WARN  - Local [UUID(9c0c8043)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 14:36:04,556 WARN  - Local [UUID(9c0c8043)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 14:36:04,556 WARN  - Local [UUID(9c0c8043)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 14:36:06,672 INFO  - WorkflowExecutionActor-9c0c8043-5ecc-485e-a776-c30b5945b92d [UUID(9c0c8043)]: Starting BuildCembaReferences.CreateReferenceFastaIndex, BuildCembaReferences.CreateReferenceDictionary, BuildCembaReferences.Convert
+2024-07-18 14:36:14,887 WARN  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: Unrecognized runtime attribute keys: disks, memory
+2024-07-18 14:36:14,887 WARN  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.Convert:NA:1]: Unrecognized runtime attribute keys: disks, memory
+2024-07-18 14:36:14,887 WARN  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceDictionary:NA:1]: Unrecognized runtime attribute keys: disks, memory
+2024-07-18 14:36:14,978 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceDictionary:NA:1]: `set -euo pipefail
+
+# if the WDL/task contains a monitoring script as input
+if [ ! -z "" ]; then
+  chmod a+x 
+   > monitoring.log &
+else
+  echo "No monitoring script given as input" > monitoring.log &
+fi
+
+# create a reference dict
+java -Xmx3500m -jar /picard-tools/picard.jar CreateSequenceDictionary \
+  REFERENCE=/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceDictionary/inputs/-2049126640/GRCh38.primary_assembly.genome.fa.gz \
+  OUTPUT=GRCh38.primary_assembly.genome.fa.gz.dict`
+2024-07-18 14:36:14,978 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: `set -euo pipefail
+
+# if the WDL/task contains a monitoring script as input
+if [ ! -z "" ]; then
+  chmod a+x 
+   > monitoring.log &
+else
+  echo "No monitoring script given as input" > monitoring.log &
+fi
+
+declare -a FASTA_TEMP=$(mktemp fasta_XXXXXX)
+cp /cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceFastaIndex/inputs/-2049126640/GRCh38.primary_assembly.genome.fa.gz $FASTA_TEMP
+
+# create a reference index
+samtools faidx \
+    $FASTA_TEMP
+
+mv $FASTA_TEMP.fai GRCh38.primary_assembly.genome.fa.gz.fai`
+2024-07-18 14:36:14,978 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.Convert:NA:1]: `# if the WDL/task contains a monitoring script as input
+if [ ! -z "" ]; then
+  chmod a+x 
+   > monitoring.log &
+else
+  echo "No monitoring script given as input" > monitoring.log &
+fi
+
+python3 /build_bisulfite_references.py \
+  --input-fasta /cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-Convert/inputs/-2049126640/GRCh38.primary_assembly.genome.fa.gz \
+  --forward-convert-out genome_mfa.CT_conversion.fa \
+  --reverse-convert-out genome_mfa.GA_conversion.fa`
+2024-07-18 14:36:15,013 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/broadinstitute/samtools@sha256:fa0c51a8fd4c046ad50c7e5fc120a6fd08d451dfd44ad1ef8538a56cb76ec89c \
+echo "successfully pulled quay.io/broadinstitute/samtools@sha256:fa0c51a8fd4c046ad50c7e5fc120a6fd08d451dfd44ad1ef8538a56cb76ec89c!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "1" != "1" ];
+then
+    PE="-pe omp 1"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_9c0c8043_CreateReferenceFastaIndex \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceFastaIndex \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceFastaIndex/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceFastaIndex/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceFastaIndex:/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceFastaIndex \
+      docker://quay.io/broadinstitute/samtools@sha256:fa0c51a8fd4c046ad50c7e5fc120a6fd08d451dfd44ad1ef8538a56cb76ec89c /bin/bash \
+      /cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceFastaIndex/execution/script
+2024-07-18 14:36:15,013 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceDictionary:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/broadinstitute/picard@sha256:9c2a0bb578551945e535aca1bf01c32a50a7ad9a67b7e20da97b28490a552dc5 \
+echo "successfully pulled quay.io/broadinstitute/picard@sha256:9c2a0bb578551945e535aca1bf01c32a50a7ad9a67b7e20da97b28490a552dc5!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "1" != "1" ];
+then
+    PE="-pe omp 1"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_9c0c8043_CreateReferenceDictionary \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceDictionary \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceDictionary/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceDictionary/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceDictionary:/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceDictionary \
+      docker://quay.io/broadinstitute/picard@sha256:9c2a0bb578551945e535aca1bf01c32a50a7ad9a67b7e20da97b28490a552dc5 /bin/bash \
+      /cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceDictionary/execution/script
+2024-07-18 14:36:15,014 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.Convert:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/broadinstitute/bisulfite-references@sha256:d26368f7bf3c985eeea5f1fdffe95abda2ac2424644973c18742b0a29c261d63 \
+echo "successfully pulled quay.io/broadinstitute/bisulfite-references@sha256:d26368f7bf3c985eeea5f1fdffe95abda2ac2424644973c18742b0a29c261d63!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "1" != "1" ];
+then
+    PE="-pe omp 1"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_9c0c8043_Convert \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-Convert \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-Convert/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-Convert/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-Convert:/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-Convert \
+      docker://quay.io/broadinstitute/bisulfite-references@sha256:d26368f7bf3c985eeea5f1fdffe95abda2ac2424644973c18742b0a29c261d63 /bin/bash \
+      /cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-Convert/execution/script
+2024-07-18 14:36:18,700 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceDictionary:NA:1]: job id: 593329
+2024-07-18 14:36:18,700 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: job id: 593325
+2024-07-18 14:36:18,700 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.Convert:NA:1]: job id: 593326
+2024-07-18 14:36:18,705 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-18 14:36:18,705 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceDictionary:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-18 14:36:18,705 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.Convert:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-18 14:58:37,024 INFO  - WorkflowExecutionActor-9c0c8043-5ecc-485e-a776-c30b5945b92d [UUID(9c0c8043)]: Aborting workflow
+2024-07-18 14:58:37,041 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: executing: docker kill `cat /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceFastaIndex/execution/docker_cid`
+2024-07-18 14:58:37,041 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.Convert:NA:1]: executing: docker kill `cat /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-Convert/execution/docker_cid`
+2024-07-18 14:58:37,041 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceDictionary:NA:1]: executing: docker kill `cat /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/9c0c8043-5ecc-485e-a776-c30b5945b92d/call-CreateReferenceDictionary/execution/docker_cid`
+2024-07-18 14:58:37,074 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.Convert:NA:1]: BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043):BuildCembaReferences.Convert:NA:1] Aborted StandardAsyncJob(593326)
+2024-07-18 14:58:37,074 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceDictionary:NA:1]: BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043):BuildCembaReferences.CreateReferenceDictionary:NA:1] Aborted StandardAsyncJob(593329)
+2024-07-18 14:58:37,074 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043):BuildCembaReferences.CreateReferenceFastaIndex:NA:1] Aborted StandardAsyncJob(593325)
+2024-07-18 14:59:24,032 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(9c0c8043)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: Status change from WaitingForReturnCode to Done
+2024-07-18 14:59:24,075 INFO  - WorkflowExecutionActor-9c0c8043-5ecc-485e-a776-c30b5945b92d [UUID(9c0c8043)]: WorkflowExecutionActor [UUID(9c0c8043)] aborted: BuildCembaReferences.CreateReferenceFastaIndex:NA:1

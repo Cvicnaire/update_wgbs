@@ -1,0 +1,8 @@
+2024-07-18 15:54:47,652 INFO  - MaterializeWorkflowDescriptorActor [UUID(1888fb6f)]: Parsing workflow as WDL 1.0
+2024-07-18 15:54:48,084 INFO  - MaterializeWorkflowDescriptorActor [UUID(1888fb6f)]: Call-to-Backend assignments: BuildCembaReferences.IndexForward -> Local, BuildCembaReferences.IndexReverse -> Local, BuildCembaReferences.CreateReferenceDictionary -> Local, BuildCembaReferences.CreateReferenceFastaIndex -> Local, BuildCembaReferences.Convert -> Local
+2024-07-18 15:54:48,223 WARN  - Local [UUID(1888fb6f)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 15:54:48,223 WARN  - Local [UUID(1888fb6f)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 15:54:48,223 WARN  - Local [UUID(1888fb6f)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 15:54:48,223 WARN  - Local [UUID(1888fb6f)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 15:54:48,223 WARN  - Local [UUID(1888fb6f)]: Key/s [disks, memory] is/are not supported by backend. Unsupported attributes will not be part of job executions.
+2024-07-18 15:54:50,334 INFO  - WorkflowExecutionActor-1888fb6f-9c9d-4e6c-8b3c-795554746239 [UUID(1888fb6f)]: Starting BuildCembaReferences.CreateReferenceDictionary, BuildCembaReferences.CreateReferenceFastaIndex, BuildCembaReferences.Convert

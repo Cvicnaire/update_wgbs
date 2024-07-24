@@ -1,0 +1,177 @@
+2024-07-22 14:22:44,773 INFO  - MaterializeWorkflowDescriptorActor [UUID(807e7772)]: Parsing workflow as WDL 1.0
+2024-07-22 14:22:45,197 INFO  - MaterializeWorkflowDescriptorActor [UUID(807e7772)]: Call-to-Backend assignments: BuildCembaReferences.Convert -> Local, BuildCembaReferences.CreateReferenceFastaIndex -> Local, BuildCembaReferences.IndexReverse -> Local, BuildCembaReferences.CreateReferenceDictionary -> Local, BuildCembaReferences.IndexForward -> Local
+2024-07-22 14:22:47,464 INFO  - WorkflowExecutionActor-807e7772-896c-4bc5-bbca-42009637a225 [UUID(807e7772)]: Starting BuildCembaReferences.Convert, BuildCembaReferences.CreateReferenceFastaIndex, BuildCembaReferences.CreateReferenceDictionary
+2024-07-22 14:22:55,323 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceDictionary:NA:1]: `set -euo pipefail
+
+if [ -n "" ]; then
+  chmod a+x 
+   > monitoring.log &
+else
+  echo "No monitoring script given as input" > monitoring.log &
+fi
+
+picard CreateSequenceDictionary \
+  REFERENCE=/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceDictionary/inputs/-2049126640/chr21.genome.fa \
+  OUTPUT=chr21.genome.dict`
+2024-07-22 14:22:55,323 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: `set -euo pipefail
+
+if [ -n "" ]; then
+  chmod a+x 
+   > monitoring.log &
+else
+  echo "No monitoring script given as input" > monitoring.log &
+fi
+
+cp /cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceFastaIndex/inputs/-2049126640/chr21.genome.fa fasta_temp.fa
+
+samtools faidx fasta_temp.fa
+
+mv fasta_temp.fa.fai chr21.genome.fa.fai`
+2024-07-22 14:22:55,323 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.Convert:NA:1]: `if [ -n "" ]; then
+  chmod a+x 
+   > monitoring.log &
+else
+  echo "No monitoring script given as input" > monitoring.log &
+fi
+
+python3 /build_bisulfite_references.py \
+  --input-fasta /cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-Convert/inputs/-2049126640/chr21.genome.fa \
+  --forward-convert-out genome_mfa.CT_conversion.fa \
+  --reverse-convert-out genome_mfa.GA_conversion.fa`
+2024-07-22 14:22:55,356 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.Convert:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/broadinstitute/bisulfite-references@sha256:d26368f7bf3c985eeea5f1fdffe95abda2ac2424644973c18742b0a29c261d63 \
+echo "successfully pulled quay.io/broadinstitute/bisulfite-references@sha256:d26368f7bf3c985eeea5f1fdffe95abda2ac2424644973c18742b0a29c261d63!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "16" != "1" ];
+then
+    PE="-pe omp 16"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_807e7772_Convert \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-Convert \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-Convert/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-Convert/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-Convert:/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-Convert \
+      docker://quay.io/broadinstitute/bisulfite-references@sha256:d26368f7bf3c985eeea5f1fdffe95abda2ac2424644973c18742b0a29c261d63 /bin/bash \
+      /cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-Convert/execution/script
+2024-07-22 14:22:55,356 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/mulled-v2-03d30cf7bcc23ba5d755e498a98359af8a2cd947@sha256:85901b220b231c459862178478f72885b2ebda35e45f560bf14b8ff2e27ec310 \
+echo "successfully pulled quay.io/biocontainers/mulled-v2-03d30cf7bcc23ba5d755e498a98359af8a2cd947@sha256:85901b220b231c459862178478f72885b2ebda35e45f560bf14b8ff2e27ec310!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "16" != "1" ];
+then
+    PE="-pe omp 16"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_807e7772_CreateReferenceFastaIndex \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceFastaIndex \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceFastaIndex/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceFastaIndex/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceFastaIndex:/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceFastaIndex \
+      docker://quay.io/biocontainers/mulled-v2-03d30cf7bcc23ba5d755e498a98359af8a2cd947@sha256:85901b220b231c459862178478f72885b2ebda35e45f560bf14b8ff2e27ec310 /bin/bash \
+      /cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceFastaIndex/execution/script
+2024-07-22 14:22:55,356 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceDictionary:NA:1]: executing: # Make sure the SINGULARITY_CACHEDIR variable is set. If not use a default
+# based on the users home.
+if [ -z $SINGULARITY_CACHEDIR ]; 
+    then CACHE_DIR=$HOME/.singularity/cache
+    else CACHE_DIR=$SINGULARITY_CACHEDIR
+fi
+# Make sure cache dir exists so lock file can be created by flock
+mkdir -p $CACHE_DIR  
+LOCK_FILE=$CACHE_DIR/singularity_pull_flock
+# Create an exclusive filelock with flock. --verbose is useful for 
+# for debugging, as is the echo command. These show up in `stdout.submit`.
+flock --verbose --exclusive --timeout 900 $LOCK_FILE \
+singularity exec --containall docker://quay.io/biocontainers/mulled-v2-23d9f7c700e78129a769e78521eb86d6b8341923@sha256:57f40c3c30a48a7be6e2b101b0b7b5503920be2eb7b452c64fa996a31476314c \
+echo "successfully pulled quay.io/biocontainers/mulled-v2-23d9f7c700e78129a769e78521eb86d6b8341923@sha256:57f40c3c30a48a7be6e2b101b0b7b5503920be2eb7b452c64fa996a31476314c!"
+
+# set up our bind mounts
+BIND="--bind /projectnb:/projectnb"
+if [ -d /restricted ]; then
+    BIND="$BIND --bind /restricted:/restricted"
+fi
+
+# configure requesting multiple slots
+PE=
+if [ "16" != "1" ];
+then
+    PE="-pe omp 16"
+fi
+
+qsub \
+  -terse \
+  -V \
+  -b y \
+  -N cromwell_807e7772_CreateReferenceDictionary \
+  -wd /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceDictionary \
+  -o /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceDictionary/execution/stdout.qsub \
+  -e /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceDictionary/execution/stderr.qsub \
+  $PE \
+  -P bubhub \
+  singularity exec --containall $BIND \
+      --bind /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceDictionary:/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceDictionary \
+      docker://quay.io/biocontainers/mulled-v2-23d9f7c700e78129a769e78521eb86d6b8341923@sha256:57f40c3c30a48a7be6e2b101b0b7b5503920be2eb7b452c64fa996a31476314c /bin/bash \
+      /cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-CreateReferenceDictionary/execution/script
+2024-07-22 14:22:59,376 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceDictionary:NA:1]: job id: 359341
+2024-07-22 14:22:59,376 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.Convert:NA:1]: job id: 359337
+2024-07-22 14:22:59,376 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: job id: 359339
+2024-07-22 14:22:59,381 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.Convert:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-22 14:22:59,381 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceDictionary:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-22 14:22:59,381 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: Status change from - to WaitingForReturnCode
+2024-07-22 14:24:40,125 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceDictionary:NA:1]: Status change from WaitingForReturnCode to Done
+2024-07-22 14:25:49,683 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.CreateReferenceFastaIndex:NA:1]: Status change from WaitingForReturnCode to Done
+2024-07-22 16:49:53,312 INFO  - WorkflowExecutionActor-807e7772-896c-4bc5-bbca-42009637a225 [UUID(807e7772)]: Aborting workflow
+2024-07-22 16:49:53,328 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.Convert:NA:1]: executing: docker kill `cat /projectnb/bubhub/cromwell/cromwell-executions/BuildCembaReferences/807e7772-896c-4bc5-bbca-42009637a225/call-Convert/execution/docker_cid`
+2024-07-22 16:49:53,351 INFO  - BackgroundConfigAsyncJobExecutionActor [UUID(807e7772)BuildCembaReferences.Convert:NA:1]: BackgroundConfigAsyncJobExecutionActor [UUID(807e7772):BuildCembaReferences.Convert:NA:1] Aborted StandardAsyncJob(359337)

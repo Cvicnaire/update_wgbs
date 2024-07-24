@@ -1,0 +1,3 @@
+2024-07-22 16:46:50,615 INFO  - MaterializeWorkflowDescriptorActor [UUID(163a674a)]: Parsing workflow as WDL 1.0
+2024-07-22 16:46:51,026 INFO  - MaterializeWorkflowDescriptorActor [UUID(163a674a)]: Call-to-Backend assignments: BuildCembaReferences.IndexForward -> Local, BuildCembaReferences.CreateReferenceDictionary -> Local, BuildCembaReferences.IndexReverse -> Local, BuildCembaReferences.CreateReferenceFastaIndex -> Local, BuildCembaReferences.Convert -> Local
+2024-07-22 16:46:53,269 INFO  - WorkflowExecutionActor-163a674a-848a-443b-ae98-d0178aa9103c [UUID(163a674a)]: Starting BuildCembaReferences.CreateReferenceDictionary, BuildCembaReferences.CreateReferenceFastaIndex, BuildCembaReferences.Convert
